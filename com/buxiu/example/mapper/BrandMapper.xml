@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.buxiu.example.mapper.BrandMapper">
+
+    <sql id="selectSQL">
+        a.id, a.brand_name, a.company_name, a.ordered, a.description, a.status
+    </sql>
+
+    <sql id="whereSQL">
+        where 1=1
+        <if test="id != null ">
+            <![CDATA[
+                and a.id = #{id}
+            ]]>
+        </if>
+        <if test="brand_name != null ">
+            <![CDATA[
+                and a.brand_name = #{brand_name}
+            ]]>
+        </if>
+        <if test="company_name != null ">
+            <![CDATA[
+                and a.company_name = #{company_name}
+            ]]>
+        </if>
+        <if test="ordered != null ">
+            <![CDATA[
+                and a.ordered = #{ordered}
+            ]]>
+        </if>
+        <if test="description != null ">
+            <![CDATA[
+                and a.description = #{description}
+            ]]>
+        </if>
+        <if test="status != null ">
+            <![CDATA[
+                and a.status = #{status}
+            ]]>
+        </if>
+    </sql>
+
+    <select id="countBrands" resultType="int" parameterType="BrandPo">
+        select
+            count(8)
+        from tb_brand a
+        <include refid="whereSQL" />
+    </select>
+    <select id="findBrandsByPage" resultType="BrandPo" parameterType="BrandPo">
+        select
+            <include refid="selectSQL" />
+        from tb_brand a
+        <include refid="whereSQL" />
+        <choose>
+            <when test="sortord != null and '' != sortord">
+                order by a.${sortord}
+            </when>
+            <otherwise>
+                order by a.id desc
+            </otherwise>
+        </choose>
+    </select>
+    <select id="getBrandById" resultType="BrandPo" parameterType="Integer">
+        select
+            <include refid="selectSQL" />
+        from tb_brand a
+        where id = #{id}
+    </select>
+    <select id="getBrandEx" resultType="BrandPo" parameterType="BrandPo">
+        select
+            <include refid="selectSQL" />
+        from tb_brand a
+        <include refid="whereSQL" />
+        limit 0, 1
+    </select>
+    <insert id="addBrand" parameterType="BrandPo">
+        insert into tb_brand
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">id,</if>
+            <if test="brand_name != null ">brand_name,</if>
+            <if test="company_name != null ">company_name,</if>
+            <if test="ordered != null ">ordered,</if>
+            <if test="description != null ">description,</if>
+            <if test="status != null ">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null ">#{id,jdbcType=INTEGER},</if>
+            <if test="brand_name != null ">#{brand_name,jdbcType=VARCHAR},</if>
+            <if test="company_name != null ">#{company_name,jdbcType=VARCHAR},</if>
+            <if test="ordered != null ">#{ordered,jdbcType=INTEGER},</if>
+            <if test="description != null ">#{description,jdbcType=VARCHAR},</if>
+            <if test="status != null ">#{status,jdbcType=INTEGER},</if>
+        </trim>
+        <selectKey keyProperty="id" resultType="Integer" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    <update id="updateBrand" parameterType="BrandPo">
+        update tb_brand
+        <trim prefix="set" suffixOverrides="," suffix=" where id = #{id} ">
+            <if test="id != null">
+                <![CDATA[
+                    id = #{id,jdbcType=INTEGER},
+                ]]>
+            </if>
+            <if test="brand_name != null">
+                <![CDATA[
+                    brand_name = #{brand_name,jdbcType=VARCHAR},
+                ]]>
+            </if>
+            <if test="company_name != null">
+                <![CDATA[
+                    company_name = #{company_name,jdbcType=VARCHAR},
+                ]]>
+            </if>
+            <if test="ordered != null">
+                <![CDATA[
+                    ordered = #{ordered,jdbcType=INTEGER},
+                ]]>
+            </if>
+            <if test="description != null">
+                <![CDATA[
+                    description = #{description,jdbcType=VARCHAR},
+                ]]>
+            </if>
+            <if test="status != null">
+                <![CDATA[
+                    status = #{status,jdbcType=INTEGER},
+                ]]>
+            </if>
+        </trim>
+    </update>
+    <delete id="deleteBrandById" parameterType="Integer">
+        delete from tb_brand where id = #{id}
+    </delete>
+    <delete id="deleteBrandEx" parameterType="BrandPo">
+        delete from tb_brand
+        <include refid="whereSQL" />
+    </delete>
+</mapper>
